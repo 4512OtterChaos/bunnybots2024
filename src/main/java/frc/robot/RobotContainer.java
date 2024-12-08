@@ -6,6 +6,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -17,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.drivetrain.TunerConstants;
+import frc.robot.util.OCXboxController;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -31,12 +35,30 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController driver = new CommandXboxController(0);
+    private final OCXboxController driver = new OCXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
         configureBindings();
+        setSwerveUpdateFrequency(drivetrain.getModule(0).getDriveMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(0).getSteerMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(1).getDriveMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(1).getSteerMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(2).getDriveMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(2).getSteerMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(3).getDriveMotor());
+        setSwerveUpdateFrequency(drivetrain.getModule(3).getSteerMotor());
+        ParentDevice.optimizeBusUtilizationForAll(drivetrain.getModule(0).getDriveMotor(), drivetrain.getModule(0).getSteerMotor(), drivetrain.getModule(1).getDriveMotor(), drivetrain.getModule(1).getSteerMotor(), drivetrain.getModule(2).getDriveMotor(), drivetrain.getModule(3).getDriveMotor(), drivetrain.getModule(3).getSteerMotor());
+
+    }
+    
+    public void setSwerveUpdateFrequency(TalonFX motor) {
+        motor.getDutyCycle().setUpdateFrequency(100);
+        motor.getMotorVoltage().setUpdateFrequency(100);
+        motor.getPosition().setUpdateFrequency(100);
+        motor.getVelocity().setUpdateFrequency(50);
+        motor.getStatorCurrent().setUpdateFrequency(50);
     }
 
     private void configureBindings() {
@@ -45,9 +67,9 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-driver.getForward() * driver.getDriveSpeed()) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getStrafe() * driver.getDriveSpeed()) // Drive left with negative X (left)
+                    .withRotationalRate(-driver.getTurn() * driver.getTurnSpeed()) // Drive counterclockwise with negative X (left)
             )
         );
 

@@ -17,10 +17,10 @@ public class ArmConstants {
     public static final int kLeftMotorID = 9;
     public static final int kRightMotorID = 10;
     // angle of the arm while resting
-    public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(-16.5);
+    public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(180-4.233);
     // shooter_angle == -arm_angle + offset
     public static final Rotation2d kShooterAngleOffset = Rotation2d.fromDegrees(34.5);
-    public static final Rotation2d kMaxAngle = Rotation2d.fromDegrees(95);
+    public static final Rotation2d kMaxAngle = Rotation2d.fromDegrees(-21.521);
     public static final Rotation2d kAngleTolerance = Rotation2d.fromDegrees(1);
 
     public static final double kStallThresholdAmps = 20;
