@@ -14,8 +14,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ArmConstants {
-    public static final int kLeftMotorID = 9;
-    public static final int kRightMotorID = 10;
+    public static final int kLeftMotorID = 10;
+    public static final int kRightMotorID = 9;
     // angle of the arm while resting
     public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(180-4.233);
     // shooter_angle == -arm_angle + offset

@@ -41,7 +41,7 @@ public class Intake extends SubsystemBase{
             motor.setVoltage(ff.calculate(PID.getSetpoint())+PID.calculate(encoder.getVelocity()));
         }
 
-        if (getFloorCurrent() <= kStallCurrent){
+        if (getCurrent() <= kStallCurrent){
             lastFreeTime = Timer.getFPGATimestamp();
         }
 
@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase{
         return Timer.getFPGATimestamp() >= (lastFreeTime + kStallTime);
     }
 
-    public double getFloorCurrent(){
+    public double getCurrent(){
         return motor.getOutputCurrent();
     }
 
@@ -71,11 +71,11 @@ public class Intake extends SubsystemBase{
     }
 
     public Command setVoltageInC(){
-        return run(()->setVoltage(7));
+        return run(()->setVoltage(2.5));
     }
 
     public Command setVoltageOutC(){
-        return run(()->setVoltage(-7));
+        return run(()->setVoltage(-2.5));
     }
 
     public Command setVelocityC(double RPM){
@@ -92,7 +92,7 @@ public class Intake extends SubsystemBase{
 
     public void log() {
         SmartDashboard.putNumber("Intake/Motor Voltage", motor.getAppliedOutput()*12);
-        SmartDashboard.putNumber("Intake/Motor Current", getFloorCurrent());
+        SmartDashboard.putNumber("Intake/Motor Current", getCurrent());
         SmartDashboard.putBoolean("Intake/isStalled", isStalled());
     }
 }

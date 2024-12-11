@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.drivetrain.TunerConstants;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.OCXboxController;
 
 public class RobotContainer {
@@ -38,6 +39,7 @@ public class RobotContainer {
     private final OCXboxController driver = new OCXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Intake intake = new Intake();
 
     public RobotContainer() {
         configureBindings();
@@ -77,6 +79,8 @@ public class RobotContainer {
         driver.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
         ));
+        driver.leftTrigger().whileTrue(intake.setVoltageInC());
+        driver.leftBumper().whileTrue(intake.setVoltageOutC());
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
