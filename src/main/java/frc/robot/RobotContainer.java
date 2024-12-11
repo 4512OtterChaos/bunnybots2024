@@ -1,4 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
+ // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -13,6 +13,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -25,7 +27,7 @@ import frc.robot.util.OCXboxController;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.of(1.5).in(RadiansPerSecond); // 1.5 rotations per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -51,8 +53,9 @@ public class RobotContainer {
         setSwerveUpdateFrequency(drivetrain.getModule(2).getSteerMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(3).getDriveMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(3).getSteerMotor());
-        ParentDevice.optimizeBusUtilizationForAll(drivetrain.getModule(0).getDriveMotor(), drivetrain.getModule(0).getSteerMotor(), drivetrain.getModule(1).getDriveMotor(), drivetrain.getModule(1).getSteerMotor(), drivetrain.getModule(2).getDriveMotor(), drivetrain.getModule(3).getDriveMotor(), drivetrain.getModule(3).getSteerMotor());
+        ParentDevice.optimizeBusUtilizationForAll(drivetrain.getModule(0).getDriveMotor(), drivetrain.getModule(0).getSteerMotor(), drivetrain.getModule(1).getDriveMotor(), drivetrain.getModule(1).getSteerMotor(), drivetrain.getModule(2).getDriveMotor(), drivetrain.getModule(2).getSteerMotor(), drivetrain.getModule(3).getDriveMotor(), drivetrain.getModule(3).getSteerMotor());
 
+        drivetrain.setOperatorPerspectiveForward(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero : Rotation2d.k180deg);
     }
     
     public void setSwerveUpdateFrequency(TalonFX motor) {
@@ -69,9 +72,9 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getForward() * driver.getDriveSpeed()) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getStrafe() * driver.getDriveSpeed()) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getTurn() * driver.getTurnSpeed()) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(driver.getForward() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(driver.getStrafe() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(driver.getTurn() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
