@@ -1,6 +1,5 @@
 package frc.robot.subsystems.arm;
 
-import static edu.wpi.first.wpilibj2.command.Commands.none;
 import static frc.robot.subsystems.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.StatusCode;
@@ -121,7 +120,12 @@ public class Arm extends SubsystemBase {
 
     public void setRotation(Rotation2d targetRot){
         isManual = false;
-        this.targetAngle = Rotation2d.fromRotations(MathUtil.clamp(targetRot.getRotations(), kHomeAngle.getRotations(), kMaxAngle.getRotations()));
+        this.targetAngle = Rotation2d.fromRotations(MathUtil.clamp(targetRot.getRotations(), kMaxAngle.getRotations(), kHomeAngle.getRotations()));
+    }
+
+    public void decreaseAngle(double angleDecrease){
+        this.targetAngle = Rotation2d.fromDegrees(MathUtil.clamp(targetAngle.getDegrees() - angleDecrease, kMaxAngle.getDegrees(), kHomeAngle.getDegrees()));
+
     }
 
     public void stop(){ 

@@ -71,7 +71,7 @@ public class Intake extends SubsystemBase{
     }
 
     public Command setVoltageInC(){
-        return run(()->setVoltage(2.5));
+        return run(()->setVoltage(2.5)).until(()->isStalled());
     }
 
     public Command setVoltageOutC(){

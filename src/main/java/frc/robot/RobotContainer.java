@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.drivetrain.TunerConstants;
@@ -42,9 +44,13 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Intake intake = new Intake();
+    public final Arm arm = new Arm();
+    public final Superstructure superstructure = new Superstructure(drivetrain, intake, arm);
+
 
     public RobotContainer() {
         configureBindings();
+        intake.setDefaultCommand(intake.setVoltageC(1));
         setSwerveUpdateFrequency(drivetrain.getModule(0).getDriveMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(0).getSteerMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(1).getDriveMotor());
@@ -67,10 +73,8 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
+        //DRIVE COMMAND
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(driver.getForward() * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(driver.getStrafe() * MaxSpeed) // Drive left with negative X (left)
@@ -82,18 +86,29 @@ public class RobotContainer {
         driver.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
         ));
-        driver.leftTrigger().whileTrue(intake.setVoltageInC());
-        driver.leftBumper().whileTrue(intake.setVoltageOutC());
 
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        //INTAKE COMMANDS
+        driver.rightTrigger().whileTrue(superstructure.intake());
+        driver.rightBumper().whileTrue(superstructure.outtakeTote());
+        driver.back().whileTrue(intake.setVoltageOutC());
 
-        // reset the field-centric heading on left bumper press
-        driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        //Decrease arm angle (relatively) slowly while intaking
+        driver.leftTrigger()
+            .whileTrue(superstructure.decreaseAngle());
+
+
+        
+
+        // reset the robot heading to forward
+        driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        // // Run SysId routines when holding back/start and X/Y.
+        // // Note that each routine should be run exactly once in a single log.
+        // driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

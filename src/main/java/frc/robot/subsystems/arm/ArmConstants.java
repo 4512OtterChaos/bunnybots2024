@@ -17,10 +17,12 @@ public class ArmConstants {
     public static final int kLeftMotorID = 10;
     public static final int kRightMotorID = 9;
     // angle of the arm while resting
-    public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(180-4.233);
+    public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(180-3.571);
+    public static final Rotation2d kToteAngle = Rotation2d.fromDegrees(36);
+    public static final Rotation2d kIntakeAngle = Rotation2d.fromDegrees(-4);
     // shooter_angle == -arm_angle + offset
     public static final Rotation2d kShooterAngleOffset = Rotation2d.fromDegrees(34.5);
-    public static final Rotation2d kMaxAngle = Rotation2d.fromDegrees(-21.521);
+    public static final Rotation2d kMaxAngle = Rotation2d.fromDegrees(-21.5);
     public static final Rotation2d kAngleTolerance = Rotation2d.fromDegrees(1);
 
     public static final double kStallThresholdAmps = 20;
@@ -30,7 +32,7 @@ public class ArmConstants {
     public static final TalonFXConfiguration kConfig = new TalonFXConfiguration();
     static {
         FeedbackConfigs feedback = kConfig.Feedback;
-        feedback.SensorToMechanismRatio = 5 * 4 * (52.0 / 10.0); // 104:1
+        feedback.SensorToMechanismRatio = 5 * 4 * 3; // 60:1
 
         MotorOutputConfigs output = kConfig.MotorOutput;
         output.NeutralMode = NeutralModeValue.Brake;
