@@ -9,6 +9,9 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.ChassisReference;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,6 +43,7 @@ public class Arm extends SubsystemBase {
     private double targetVoltage = 0;
 
     private double lastNonStallTime = Timer.getFPGATimestamp();
+
 
     private boolean isHoming = false;
 
@@ -190,8 +194,8 @@ public class Arm extends SubsystemBase {
 
     SingleJointedArmSim armSim = new SingleJointedArmSim(
         LinearSystemId.identifyPositionSystem(
-            kConfig.Slot0.kV,
-            kConfig.Slot0.kA
+            kSimkV,
+            kSimkA
         ),
         DCMotor.getFalcon500(2),
         60,
@@ -203,16 +207,30 @@ public class Arm extends SubsystemBase {
 
     DCMotorSim motorSim = new DCMotorSim(
         LinearSystemId.identifyPositionSystem(
-            kConfig.Slot0.kV,
-            kConfig.Slot0.kA
+            kSimkV,
+            kSimkA
         ),
-        DCMotor.getFalcon500(2));
+        DCMotor.getFalcon500(2)
+    );
 
-    PWMSim testSim = new PWMSim(8);
+    
     
     public void simulationPeriodic() {
+        TalonFXSimState motorSimState = leftMotor.getSimState();
+        motorSimState.Orientation =  ChassisReference.Clockwise_Positive;//TODO: Fix, idk what it means
+
+        motorSimState.setSupplyVoltage(leftMotor.getSupplyVoltage().getValue());//TODO: Add friction? Also, idk that the voltage should be accessed like this
+
+        motorSim.setInputVoltage(motorSimState.getMotorVoltage());
+
+        motorSim.update(0.02);
+
+        motorSimState.setRawRotorPosition(motorSim.getAngularPositionRotations() * 60);//TODO: 60 is gearing
+        motorSimState.setRotorVelocity(motorSim.getAngularVelocityRPM() / 60.0 * 60);//TODO: 60 is gearing
+        
         double voltage = motorSim.getInputVoltage();
         armSim.setInput(voltage);
 		armSim.update(0.02);
     }
+        
 }

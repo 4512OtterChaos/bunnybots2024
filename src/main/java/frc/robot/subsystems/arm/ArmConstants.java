@@ -28,6 +28,9 @@ public class ArmConstants {
     public static final double kStallThresholdAmps = 20;//TODO: change to appropriate for balloons
     public static final double kStallThresholdSeconds = 0.5;
 
+    public static final double kSimkV = 0.0000000001;
+    public static final double kSimkA = 0.0000000001;
+
     // (applied to left motor, right motor follows)
     public static final TalonFXConfiguration kConfig = new TalonFXConfiguration();
     static {
