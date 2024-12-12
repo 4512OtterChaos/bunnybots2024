@@ -96,8 +96,7 @@ public class RobotContainer {
         driver.leftTrigger()
             .whileTrue(superstructure.decreaseAngle());
 
-
-        
+        driver.povDown().onTrue(arm.homingSequenceC());
 
         // reset the robot heading to forward
         driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

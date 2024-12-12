@@ -22,10 +22,10 @@ public class ArmConstants {
     public static final Rotation2d kIntakeAngle = Rotation2d.fromDegrees(-4);
     // shooter_angle == -arm_angle + offset
     public static final Rotation2d kShooterAngleOffset = Rotation2d.fromDegrees(34.5);
-    public static final Rotation2d kMaxAngle = Rotation2d.fromDegrees(-21.5);
+    public static final Rotation2d kMinAngle = Rotation2d.fromDegrees(-21.5);
     public static final Rotation2d kAngleTolerance = Rotation2d.fromDegrees(1);
 
-    public static final double kStallThresholdAmps = 20;
+    public static final double kStallThresholdAmps = 20;//TODO: change to appropriate for balloons
     public static final double kStallThresholdSeconds = 0.5;
 
     // (applied to left motor, right motor follows)

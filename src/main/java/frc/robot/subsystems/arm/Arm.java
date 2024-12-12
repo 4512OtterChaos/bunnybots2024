@@ -12,6 +12,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -19,6 +21,9 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.PWMSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -73,11 +78,11 @@ public class Arm extends SubsystemBase {
         double currentKG = Math.cos(getArmRotations()) * kConfig.Slot0.kG;
         double adjustedVoltage = targetVoltage + currentKG;
 
-        if (currentRot >= kMaxAngle.getRotations()) {
-            adjustedVoltage = Math.min(adjustedVoltage, currentKG);
+        if (currentRot <= kMinAngle.getRotations()) {
+            adjustedVoltage = Math.min(currentKG, adjustedVoltage);//TODO: Switch max & min?
         }
-        if (!isHoming && currentRot <= kHomeAngle.plus(kAngleTolerance).getRotations() && targetAngle.getRotations() <= kHomeAngle.plus(kAngleTolerance.times(3)).getRotations()) {
-            adjustedVoltage = Math.max(adjustedVoltage, 0);
+        if (!isHoming && currentRot >= kHomeAngle.plus(kAngleTolerance).getRotations() && targetAngle.getRotations() >= kHomeAngle.plus(kAngleTolerance.times(3)).getRotations()) {
+            adjustedVoltage = Math.max(adjustedVoltage, 0);//TODO: Switch max & min?
             if (!isManual) { // go limp at home angle
                 isManual = true;
                 adjustedVoltage = 0;
@@ -120,12 +125,11 @@ public class Arm extends SubsystemBase {
 
     public void setRotation(Rotation2d targetRot){
         isManual = false;
-        this.targetAngle = Rotation2d.fromRotations(MathUtil.clamp(targetRot.getRotations(), kMaxAngle.getRotations(), kHomeAngle.getRotations()));
+        this.targetAngle = Rotation2d.fromRotations(MathUtil.clamp(targetRot.getRotations(), kMinAngle.getRotations(), kHomeAngle.getRotations()));
     }
 
-    public void decreaseAngle(double angleDecrease){
-        this.targetAngle = Rotation2d.fromDegrees(MathUtil.clamp(targetAngle.getDegrees() - angleDecrease, kMaxAngle.getDegrees(), kHomeAngle.getDegrees()));
-
+    public void decreaseAngle(double angleDecrease){//TODO: Change isManual?
+        this.targetAngle = Rotation2d.fromDegrees(MathUtil.clamp(targetAngle.getDegrees() - angleDecrease, kMinAngle.getDegrees(), kHomeAngle.getDegrees()));
     }
 
     public void stop(){ 
@@ -161,7 +165,7 @@ public class Arm extends SubsystemBase {
         return startEnd(
             () -> {
                 isHoming = true;
-                setVoltage(-2);
+                setVoltage(2);
             },
             () -> {
                 isHoming = false;
@@ -182,5 +186,33 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm/Motor Velocity", getVelocity());
         SmartDashboard.putBoolean("Arm/Motor Stalled", isStalled());
         SmartDashboard.putNumber("Arm/Time", Timer.getFPGATimestamp());
+    }
+
+    SingleJointedArmSim armSim = new SingleJointedArmSim(
+        LinearSystemId.identifyPositionSystem(
+            kConfig.Slot0.kV,
+            kConfig.Slot0.kA
+        ),
+        DCMotor.getFalcon500(2),
+        60,
+        Units.inchesToMeters(14.8),
+        kMinAngle.getRadians(),
+        kHomeAngle.getRadians(),
+        true,
+        kHomeAngle.getRadians());
+
+    DCMotorSim motorSim = new DCMotorSim(
+        LinearSystemId.identifyPositionSystem(
+            kConfig.Slot0.kV,
+            kConfig.Slot0.kA
+        ),
+        DCMotor.getFalcon500(2));
+
+    PWMSim testSim = new PWMSim(8);
+    
+    public void simulationPeriodic() {
+        double voltage = motorSim.getInputVoltage();
+        armSim.setInput(voltage);
+		armSim.update(0.02);
     }
 }
