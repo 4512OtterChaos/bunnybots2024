@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -39,9 +37,8 @@ public class Superstructure {
     }
 
     public Command decreaseAngle(){
-        if (intake.getCurrentCommand() == intake.setVoltageInC()){
-            return run(()->arm.decreaseAngle(3)).finallyDo(()->arm.setRotationC(ArmConstants.kIntakeAngle));
-        }
-        return Commands.none();
+        return run(()->arm.decreaseAngle(1))
+            .onlyIf(()->(arm.getTargetRotations() <= ArmConstants.kIntakeAngle.getRotations()) && (arm.getArmRotations() <= ArmConstants.kIntakeAngle.plus(ArmConstants.kAngleTolerance.times(4)).getRotations()));
+            //Only activates if: our target angle < our intake angle AND the error between out target and actual angle is small(ish)
     }
 }

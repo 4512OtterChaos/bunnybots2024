@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.drivetrain.TunerConstants;
@@ -94,8 +95,14 @@ public class RobotContainer {
 
         //Decrease arm angle (relatively) slowly while intaking
         driver.leftTrigger()
-            .whileTrue(superstructure.decreaseAngle());
+            .whileTrue(superstructure.decreaseAngle())
+            .onFalse(
+                arm.setRotationC(ArmConstants.kIntakeAngle)
+                    .withTimeout(.2)
+                    .onlyIf(()->arm.getTargetRotations() <= ArmConstants.kIntakeAngle.getRotations())
+            );
 
+        //Bring the arm to the home position
         driver.povDown().onTrue(arm.homingSequenceC());
 
         // reset the robot heading to forward

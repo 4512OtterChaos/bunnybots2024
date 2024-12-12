@@ -23,11 +23,16 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -106,11 +111,19 @@ public class Arm extends SubsystemBase {
             lastNonStallTime = Timer.getFPGATimestamp();
         }
 
+        //Update mechanism 2D
+        visualizeState(getArmRotations());
+        visualizeSetpoint(targetAngle.getRotations());
+
         log();
     }
 
     public double getArmRotations() {
         return positionStatus.getValueAsDouble();
+    }
+
+    public double getTargetRotations() {
+        return targetAngle.getRotations();
     }
 
     public boolean isWithinTolerance() {
@@ -133,7 +146,8 @@ public class Arm extends SubsystemBase {
     }
 
     public void decreaseAngle(double angleDecrease){//TODO: Change isManual?
-        this.targetAngle = Rotation2d.fromDegrees(MathUtil.clamp(targetAngle.getDegrees() - angleDecrease, kMinAngle.getDegrees(), kHomeAngle.getDegrees()));
+        isManual = false;
+        this.targetAngle = Rotation2d.fromDegrees(MathUtil.clamp(targetAngle.getDegrees() - angleDecrease, kMinAngle.getDegrees(), Units.rotationsToDegrees(getArmRotations())));
     }
 
     public void stop(){ 
@@ -166,6 +180,7 @@ public class Arm extends SubsystemBase {
 
     /** Runs the arm into the hardstop, detecting a current spike and resetting the arm angle. */
     public Command homingSequenceC(){
+        if(RobotBase.isSimulation()){ return setRotationC(kHomeAngle);}
         return startEnd(
             () -> {
                 isHoming = true;
@@ -190,29 +205,80 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm/Motor Velocity", getVelocity());
         SmartDashboard.putBoolean("Arm/Motor Stalled", isStalled());
         SmartDashboard.putNumber("Arm/Time", Timer.getFPGATimestamp());
+        SmartDashboard.putData("Arm/Mech2d", mech);
     }
 
+    Mechanism2d mech = new Mechanism2d(.8, .8, new Color8Bit(0, 100, 150));
+    MechanismRoot2d mechRoot = mech.getRoot("arm", 0.4, 0.1);
+
+    private final Color8Bit kSetpointBaseColor = new Color8Bit(150, 0, 0);
+    private final Color8Bit kSetpointExtensionColor = new Color8Bit(180, 0, 0);
+    private final Color8Bit kMechBaseColor = new Color8Bit(0, 0, 150);
+    private final Color8Bit kMechExtensionColor = new Color8Bit(0, 0, 180);
+
+    private final double kSetpointWidth = 6;
+    private final double kMechWidth = 9;
+
+    private final double kDefaultArmDeg = 90;
+
+    private final MechanismLigament2d mechArm = mechRoot.append(
+            new MechanismLigament2d("Arm", kPivotHeight, 90, kMechWidth, kMechBaseColor));
+    private final MechanismLigament2d mechIntake = mechArm.append(
+            new MechanismLigament2d("Intake", kiPivotToWheels, kDefaultArmDeg, kMechWidth, kMechBaseColor));
+    private final MechanismLigament2d mechIntakeInside = mechIntake.append(
+            new MechanismLigament2d("IntakeInside", Units.inchesToMeters(5.548), 152.4, kMechWidth/2,
+                    kMechExtensionColor));
+    private final MechanismLigament2d mechJaw = mechIntakeInside.append(
+            new MechanismLigament2d("Jaw", Units.inchesToMeters(5.241), -92, kMechWidth/2, kMechExtensionColor));
+    private final MechanismLigament2d mechIntakeBottom = mechJaw.append(
+            new MechanismLigament2d("IntakeBottom", Units.inchesToMeters(12.508), 151.5, kMechWidth/2, kMechExtensionColor));
+
+    private final MechanismLigament2d setpointArm = mechRoot.append(
+            new MechanismLigament2d("setpointArmBase", kPivotHeight, 90, kSetpointWidth, kSetpointBaseColor));
+    private final MechanismLigament2d setpointIntake = setpointArm.append(
+            new MechanismLigament2d("setpointArm", kiPivotToWheels, kDefaultArmDeg, kSetpointWidth,
+                    kSetpointBaseColor));
+    private final MechanismLigament2d setpointIntakeInside = setpointIntake.append(
+            new MechanismLigament2d("setpointIntakeInside", Units.inchesToMeters(5.548), 152.4, kSetpointWidth/2,
+                    kSetpointExtensionColor));
+    private final MechanismLigament2d setpointJaw = setpointIntakeInside.append(
+            new MechanismLigament2d("setpointJaw", Units.inchesToMeters(5.241), -92, kSetpointWidth/2,
+                    kSetpointExtensionColor));
+    private final MechanismLigament2d setpointIntakeBottom = setpointJaw.append(
+            new MechanismLigament2d("IntakeBottom", Units.inchesToMeters(12.508), 151.5, kSetpointWidth/2,
+                    kSetpointExtensionColor));
+    
     SingleJointedArmSim armSim = new SingleJointedArmSim(
-        LinearSystemId.identifyPositionSystem(
-            kSimkV,
-            kSimkA
+        LinearSystemId.createSingleJointedArmSystem(
+            DCMotor.getFalcon500(2),
+            kMomentOfInertia,
+            kGearRatio
         ),
         DCMotor.getFalcon500(2),
-        60,
-        Units.inchesToMeters(14.8),
+        kGearRatio,
+        kArmLength,
         kMinAngle.getRadians(),
         kHomeAngle.getRadians(),
         true,
         kHomeAngle.getRadians());
 
+
     DCMotorSim motorSim = new DCMotorSim(
-        LinearSystemId.identifyPositionSystem(
-            kSimkV,
-            kSimkA
+        LinearSystemId.createDCMotorSystem(
+            DCMotor.getFalcon500(2),
+            kMomentOfInertia,
+            kGearRatio
         ),
         DCMotor.getFalcon500(2)
     );
-
+    
+    public void visualizeState(double armPosRotations) {
+        mechIntake.setAngle(90 - Units.rotationsToDegrees(armPosRotations));
+    }
+    
+    public void visualizeSetpoint(double targetPosRotations) {
+        setpointIntake.setAngle(90 - Units.rotationsToDegrees(targetPosRotations));
+    }
     
     
     public void simulationPeriodic() {

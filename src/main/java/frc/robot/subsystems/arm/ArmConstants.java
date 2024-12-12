@@ -12,10 +12,20 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 public class ArmConstants {
     public static final int kLeftMotorID = 10;
     public static final int kRightMotorID = 9;
+
+    public static final int kGearRatio = 60; //60:1
+    
+    public static final double kMomentOfInertia  = 0.10018343; // 342.343923 in^2*lb
+    
+    public static final double kArmLength = Units.inchesToMeters(14.8); //Arm length from end to end
+    public static final double kPivotHeight = Units.inchesToMeters(12.25);
+    public static final double kiPivotToWheels = Units.inchesToMeters(12.8);
+
     // angle of the arm while resting
     public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(180-3.571);
     public static final Rotation2d kToteAngle = Rotation2d.fromDegrees(36);
