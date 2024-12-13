@@ -24,14 +24,14 @@ public class Superstructure {
 
     public Command intake(){
         return sequence(
-            arm.setRotationC(ArmConstants.kIntakeAngle),
-            intake.setVelocityInC()
+            arm.setRotationC(ArmConstants.kIntakeAngle).withTimeout(0.75).unless(()->arm.getTargetRotations() <= ArmConstants.kIntakeAngle.getRotations()),
+            intake.setVoltageInC()
         );
     }
 
     public Command outtakeTote(){
         return sequence(
-            arm.setRotationC(ArmConstants.kToteAngle),
+            arm.setRotationC(ArmConstants.kToteAngle).withTimeout(0.75),
             intake.setVoltageOutC()
         );
     }

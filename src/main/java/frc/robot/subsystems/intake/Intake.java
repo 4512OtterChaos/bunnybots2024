@@ -54,7 +54,7 @@ public class Intake extends SubsystemBase{
 
     public void setVoltage(double voltage){
         isManual=true;
-        motor.setVoltage(voltage);
+        motor.setVoltage(-voltage);
     }
 
     public void setVelocity(double floorRPM) {
@@ -75,11 +75,11 @@ public class Intake extends SubsystemBase{
     }
 
     public Command setVoltageInC(){
-        return run(()->setVoltage(2.5)).until(()->isStalled());
+        return run(()->setVoltage(1.75)).until(()->isStalled());
     }
 
     public Command setVoltageOutC(){
-        return run(()->setVoltage(-2.5));
+        return run(()->setVoltage(-0.3));
     }
 
     public Command setVelocityC(double RPM){

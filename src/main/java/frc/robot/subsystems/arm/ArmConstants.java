@@ -27,19 +27,16 @@ public class ArmConstants {
     public static final double kiPivotToWheels = Units.inchesToMeters(12.8);
 
     // angle of the arm while resting
-    public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(180-3.571);
-    public static final Rotation2d kToteAngle = Rotation2d.fromDegrees(36);
-    public static final Rotation2d kIntakeAngle = Rotation2d.fromDegrees(-4);
+    public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(169.81175);
+    public static final Rotation2d kToteAngle = Rotation2d.fromDegrees(38.5);
+    public static final Rotation2d kIntakeAngle = Rotation2d.fromDegrees(-20);
     // shooter_angle == -arm_angle + offset
     public static final Rotation2d kShooterAngleOffset = Rotation2d.fromDegrees(34.5);
     public static final Rotation2d kMinAngle = Rotation2d.fromDegrees(-21.5);
     public static final Rotation2d kAngleTolerance = Rotation2d.fromDegrees(1);
 
     public static final double kStallThresholdAmps = 20;//TODO: change to appropriate for balloons
-    public static final double kStallThresholdSeconds = 0.5;
-
-    public static final double kSimkV = 0.0000000001;
-    public static final double kSimkA = 0.0000000001;
+    public static final double kStallThresholdSeconds = 0.25;
 
     // (applied to left motor, right motor follows)
     public static final TalonFXConfiguration kConfig = new TalonFXConfiguration();
@@ -62,13 +59,13 @@ public class ArmConstants {
         // limits.ReverseSoftLimitThreshold = kHomeAngle.getRotations();
 
         Slot0Configs control = kConfig.Slot0;
-        control.kP = 40;
+        control.kP = 30;
         control.kI = 0;
         control.kD = 0;
 
         control.GravityType = GravityTypeValue.Arm_Cosine;
-        control.kG = 0.25;
-        control.kS = 0;
+        control.kG = 0.05;
+        control.kS = 0.1;
         control.kV = 0;
 
         MotionMagicConfigs mm = kConfig.MotionMagic;

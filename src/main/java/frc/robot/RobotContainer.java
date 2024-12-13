@@ -51,7 +51,6 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
-        intake.setDefaultCommand(intake.setVoltageC(1));
         setSwerveUpdateFrequency(drivetrain.getModule(0).getDriveMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(0).getSteerMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(1).getDriveMotor());
@@ -88,12 +87,15 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
         ));
 
+        // driver.rightTrigger().whileTrue(arm.setVoltageC(-1).finallyDo(arm::stop));
+
         //INTAKE COMMANDS
+        intake.setDefaultCommand(intake.setVoltageC(0.65));
         driver.rightTrigger().whileTrue(superstructure.intake());
         driver.rightBumper().whileTrue(superstructure.outtakeTote());
         driver.back().whileTrue(intake.setVoltageOutC());
 
-        //Decrease arm angle (relatively) slowly while intaking
+        // Decrease arm angle (relatively) slowly while intaking
         driver.leftTrigger()
             .whileTrue(superstructure.decreaseAngle())
             .onFalse(
@@ -103,13 +105,15 @@ public class RobotContainer {
             );
 
         //Bring the arm to the home position
-        driver.povDown().onTrue(arm.homingSequenceC());
+        driver.povDown().onTrue(arm.setRotationC(ArmConstants.kHomeAngle));
 
         // reset the robot heading to forward
         driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // // Run SysId routines when holding back/start and X/Y.
-        // // Note that each routine should be run exactly once in a single log.
+        //TODO: ADD GYRO BUTTONS FOR AUTO ALIGN
+
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
         // driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         // driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
