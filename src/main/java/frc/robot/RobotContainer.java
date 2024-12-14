@@ -64,8 +64,6 @@ public class RobotContainer {
         setSwerveUpdateFrequency(drivetrain.getModule(3).getDriveMotor());
         setSwerveUpdateFrequency(drivetrain.getModule(3).getSteerMotor());
         ParentDevice.optimizeBusUtilizationForAll(drivetrain.getModule(0).getDriveMotor(), drivetrain.getModule(0).getSteerMotor(), drivetrain.getModule(1).getDriveMotor(), drivetrain.getModule(1).getSteerMotor(), drivetrain.getModule(2).getDriveMotor(), drivetrain.getModule(2).getSteerMotor(), drivetrain.getModule(3).getDriveMotor(), drivetrain.getModule(3).getSteerMotor());
-
-        drivetrain.setOperatorPerspectiveForward(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero : Rotation2d.k180deg);
     }
     
     public void setSwerveUpdateFrequency(TalonFX motor) {

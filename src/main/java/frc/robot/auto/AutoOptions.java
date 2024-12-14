@@ -42,16 +42,16 @@ public class AutoOptions {
 
         SmartDashboard.putData(autoOptions);
 
-        AutoBuilder.configure(
-            ()->drive.getState().Pose, 
-            (resetPose)->drive.resetPose(resetPose), 
-            ()->drive.getState().Speeds, 
-            (targetChassisSpeeds)->drive.applyRequest(()->new SwerveRequest.ApplyRobotSpeeds().withSpeeds(targetChassisSpeeds)), 
-            AutoConstants.kPathFollowingController, 
-            AutoConstants.kRobotConfig, 
-            ()->false, 
-            drive
-        );
+        // AutoBuilder.configure(
+        //     ()->drive.getState().Pose, 
+        //     (resetPose)->drive.resetPose(resetPose), 
+        //     ()->drive.getState().Speeds, 
+        //     (targetChassisSpeeds)->drive.applyRequest(()->new SwerveRequest.ApplyRobotSpeeds().withSpeeds(targetChassisSpeeds)), 
+        //     AutoConstants.kPathFollowingController, 
+        //     AutoConstants.kRobotConfig, 
+        //     ()->false, 
+        //     drive
+        // );
 
 
         System.out.println(AutoBuilder.isConfigured());

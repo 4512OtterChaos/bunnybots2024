@@ -42,17 +42,17 @@ public class AutoConstants {
     //     new ReplanningConfig()
     // );
     public static final PPHolonomicDriveController kPathFollowingController = new PPHolonomicDriveController(new PIDConstants(kPTranslationController), new PIDConstants(kPThetaController, kDThetaController));
-    public static final RobotConfig kRobotConfig = new RobotConfig( //TODO: Use correct values for weight and moi
-        Units.lbsToKilograms(74), 
-        TunerConstants.kMomentOfInertia, //Robot moment of ineria
-        new ModuleConfig(
-            Units.inchesToMeters(1.93575), 
-            kMaxLinearSpeed, 
-            1.2, 
-            DCMotor.getFalcon500(1).withReduction(6.122448979591837), 
-            60, 
-            1), 
-        TunerConstants.kTrackWidth,
-        TunerConstants.kTrackLength
-    );
+    // public static final RobotConfig kRobotConfig = new RobotConfig( //TODO: Use correct values for weight and moi
+    //     Units.lbsToKilograms(74), 
+    //     TunerConstants.kMomentOfInertia, //Robot moment of ineria
+    //     new ModuleConfig(
+    //         Units.inchesToMeters(1.93575), 
+    //         kMaxLinearSpeed, 
+    //         1.2, 
+    //         DCMotor.getFalcon500(1).withReduction(6.122448979591837), 
+    //         60, 
+    //         1), 
+    //     TunerConstants.kTrackWidth,
+    //     TunerConstants.kTrackLength
+    // );
 }
