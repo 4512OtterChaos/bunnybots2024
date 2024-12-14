@@ -83,11 +83,12 @@ public class RobotContainer {
     private void configureBindings() {
         //DRIVE COMMAND
         drivetrain.setDefaultCommand(
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(driver.getForward() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(driver.getStrafe() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(driver.getTurn() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+            drivetrain.applyRequest(() -> {
+                var speeds = driver.getSpeeds(MaxSpeed, MaxAngularRate);
+                return drive.withVelocityX(speeds.vxMetersPerSecond)
+                    .withVelocityY(speeds.vyMetersPerSecond)
+                    .withRotationalRate(speeds.omegaRadiansPerSecond);
+            })
         );
 
         driver.a().whileTrue(drivetrain.applyRequest(() -> brake));

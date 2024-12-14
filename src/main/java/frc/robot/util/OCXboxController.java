@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -10,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  */
 public class OCXboxController extends CommandXboxController {
 
-    private static final double kDeadband = 0.12;
+    private static final double kDeadband = 0.1;
 
     public static final double kSpeedSlow = .3;
     public static final double kSpeedDefault = .55;
@@ -27,17 +28,6 @@ public class OCXboxController extends CommandXboxController {
      */
     public OCXboxController(int port) {
         super(port);
-    }
-
-    /**
-     * Deadbands a value, re-scales it, and applies a power.
-     * 
-     * @param value Value to adjust
-     * @return -1 to 1
-     */
-    public static double scaledPowerDeadband(double value, double exp) {
-        value = MathUtil.applyDeadband(value, kDeadband);
-        return Math.signum(value) * Math.pow(Math.abs(value), exp);
     }
 
     public void setDriveSpeed(double drivespeed) {
@@ -58,61 +48,48 @@ public class OCXboxController extends CommandXboxController {
 
     @Override
     public double getLeftY() {
-        return getLeftY(1);
+        return -MathUtil.applyDeadband(super.getLeftY(), kDeadband);
     }
-    public double getLeftY(double exponent) {
-        return -scaledPowerDeadband(super.getLeftY(), exponent);
-    }
+
     @Override
     public double getLeftX() {
-        return getLeftX(1);
+        return -MathUtil.applyDeadband(super.getLeftX(), kDeadband);
     }
-    public double getLeftX(double exponent) {
-        return -scaledPowerDeadband(super.getLeftX(), exponent);
-    }
+
     @Override
     public double getRightY() {
-        return getRightY(1);
+        return -MathUtil.applyDeadband(super.getRightY(), kDeadband);
     }
-    public double getRightY(double exponent) {
-        return -scaledPowerDeadband(super.getRightY(), exponent);
-    }
+
     @Override
     public double getRightX() {
-        return getRightX(1);
-    }
-    public double getRightX(double exponent) {
-        return -scaledPowerDeadband(super.getRightX(), exponent);
+        return -MathUtil.applyDeadband(super.getRightX(), kDeadband);
     }
 
     /**
-     * Squares and applies deadband to left Y to give 'forward' percentage.
-     * Affected by controller driveSpeed.
-     * 
-     * @return Percentage(-1 to 1)
+     * Finds target drive speeds after applying deadband and square to controller inputs.
+     * @param maxLinearVel Maximum linear drive velocity in meters per second
+     * @param maxAngularVel Maximum angular drive velocity in radians per second
+     * @return Target robot-relative drive speeds as proportions (-1 to 1).
      */
-    public double getForward() {
-        return getLeftY(2) * drivespeed;
-    }
+    public ChassisSpeeds getSpeeds(double maxLinearVel, double maxAngularVel) {
+        double forward = getLeftY();
+        double strafe = getLeftX();
+        double turn = getRightX();
 
-    /**
-     * Squares and applies deadband to left X to give 'strafe' percentage.
-     * Affected by controller driveSpeed.
-     * 
-     * @return Percentage(-1 to 1)
-     */
-    public double getStrafe() {
-        return getLeftX(2) * drivespeed;
-    }
+        // We want to square inputs to get better low-speed control
+        // We must scale (forward, strafe) by the magnitude of their vector instead to preserve direction
+        // Controller stick (x,y) does not actually make a perfect circle, clamp below 1.0
+        double mag = Math.min(Math.hypot(forward, strafe), 1);
+        forward *= mag;
+        strafe *= mag;
+        turn *= turn * Math.signum(turn);
 
-    /**
-     * Squares and applies deadband to right X to give 'turn' percentage.
-     * Affected by controller turnSpeed.
-     * 
-     * @return Percentage(-1 to 1)
-     */
-    public double getTurn() {
-        return getRightX(2) * turnSpeed;
+        // Convert to real units
+        forward *= maxLinearVel * drivespeed;
+        strafe *= maxLinearVel * drivespeed;
+        turn *= maxAngularVel * turnSpeed;
+        return new ChassisSpeeds(forward, strafe, turn);
     }
 
     /** Rumble both controller sides */
