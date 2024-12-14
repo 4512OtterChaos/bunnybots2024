@@ -11,14 +11,17 @@ import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.auto.AutoOptions;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmConstants;
@@ -47,6 +50,7 @@ public class RobotContainer {
     public final Intake intake = new Intake();
     public final Arm arm = new Arm();
     public final Superstructure superstructure = new Superstructure(drivetrain, intake, arm);
+    public AutoOptions autos  = new AutoOptions(drivetrain, intake, arm, superstructure);
 
 
     public RobotContainer() {
@@ -110,6 +114,9 @@ public class RobotContainer {
         // reset the robot heading to forward
         driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+        //TESTTESTTESTTEST
+        driver.povUp().whileTrue(drivetrain.applyRequest(()->new SwerveRequest.ApplyRobotSpeeds().withSpeeds(new ChassisSpeeds(3, 3, 3))));
+
         //TODO: ADD GYRO BUTTONS FOR AUTO ALIGN
 
         // Run SysId routines when holding back/start and X/Y.
@@ -123,8 +130,15 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-    public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+    public void periodic(){
+        autos.periodic();
+    }
+
+    public void autonomousInit() {
+        autos.getAuto().schedule();
+    }
+    public void robotInit() {
+        autos.robotInit();
     }
 
     public void simulationPeriodic(){

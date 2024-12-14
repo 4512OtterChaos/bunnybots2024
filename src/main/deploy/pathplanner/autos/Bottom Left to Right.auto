@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "to Bottom Left"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom Left to Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtakeTote"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Bottom",
+  "choreoAuto": false
+}
