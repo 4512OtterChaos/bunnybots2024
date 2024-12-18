@@ -28,7 +28,7 @@ public class ArmConstants {
 
     // angle of the arm while resting
     public static final Rotation2d kHomeAngle = Rotation2d.fromDegrees(169.81175);
-    public static final Rotation2d kToteAngle = Rotation2d.fromDegrees(38.5);
+    public static final Rotation2d kToteAngle = Rotation2d.fromDegrees(40);
     public static final Rotation2d kIntakeAngle = Rotation2d.fromDegrees(-20);
     // shooter_angle == -arm_angle + offset
     public static final Rotation2d kShooterAngleOffset = Rotation2d.fromDegrees(34.5);

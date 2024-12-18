@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.081426148281749,
-        "y": 7.701926442593492
+        "x": 6.996265576261654,
+        "y": 7.689653048878378
       },
       "isLocked": false,
       "linkedName": "Top Right"
@@ -20,29 +20,34 @@
         "y": 7.705973796189476
       },
       "prevControl": {
-        "x": 7.937751529038733,
-        "y": 7.714738145144962
+        "x": 7.072468973020116,
+        "y": 7.73379844423341
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Top Left"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.99,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
     "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
+    "maxAngularVelocity": 40.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 137.0
   },
   "reversed": false,
   "folder": "Top pose transitions",

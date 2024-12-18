@@ -5,15 +5,28 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "to Bottom Left (straight)"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "to Bottom Left (straight)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeOff"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "outtakeTote"
+            "name": "outtakeBunny"
           }
         }
       ]

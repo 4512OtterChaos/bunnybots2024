@@ -5,21 +5,54 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "To Bottom Right"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "To Bottom Right"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Bottom Right to Left"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeOff"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Bottom Right to Left"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtakeTote"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "outtakeBunny"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 20.0
+                }
+              }
+            ]
           }
         }
       ]

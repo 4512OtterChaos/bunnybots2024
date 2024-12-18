@@ -21,6 +21,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmConstants;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.Telemetry;
 import frc.robot.subsystems.intake.Intake;
@@ -134,5 +135,12 @@ public class AutoOptions {
     private void addAutoMethods(){
         NamedCommands.registerCommand("Intake", superstructure.intake());
         NamedCommands.registerCommand("outtakeTote", superstructure.outtakeTote().withTimeout(1).finallyDo(()->intake.setVoltageC(0)));
+        NamedCommands.registerCommand("outtakeBunny", 
+            sequence(
+                arm.setRotationC(ArmConstants.kToteAngle).withTimeout(0.75),
+                intake.setVoltageC(2.5)
+            ));
+        NamedCommands.registerCommand("intakeOff", run(()->intake.setVoltageC(0)));
+
     }
 }

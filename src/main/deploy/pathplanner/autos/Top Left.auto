@@ -5,15 +5,41 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "to Top Left (straight)"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "to Top Left (straight)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeOff"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "outtakeTote"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "outtakeBunny"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 20.0
+                }
+              }
+            ]
           }
         }
       ]
